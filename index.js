@@ -33,7 +33,7 @@ app.post('/setrank', async (req, res) => {
     console.log(`Attempting to rank user ${userId} to role ${roleId}`);
     
     const response = await axios.patch(
-      `https://apis.roblox.com/cloud/v2/groups/${GROUP_ID}/memberships/${userId}`,
+      `https://apis.roblox.com/cloud/v2/groups/${GROUP_ID}/memberships/user_${userId}`,
       { roleId: roleId },
       {
         headers: {
