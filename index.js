@@ -32,11 +32,11 @@ app.post('/setrank', async (req, res) => {
     
     console.log(`Attempting to rank user ${userId} to role ${roleId}`);
     
-    // Use the correct Cloud API v2 format
+    // Use v1 Groups API instead
     const response = await axios.patch(
-      `https://apis.roblox.com/cloud/v2/groups/${GROUP_ID}/memberships/${userId}:setRole`,
+      `https://groups.roblox.com/v1/groups/${GROUP_ID}/users/${userId}`,
       { 
-        role: `groups/${GROUP_ID}/roles/${roleId}`
+        roleId: parseInt(roleId)
       },
       {
         headers: {
