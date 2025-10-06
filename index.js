@@ -15,12 +15,22 @@ app.get('/', (req, res) => {
 
 // Endpoint to change ranks
 app.post('/setrank', async (req, res) => {
+  console.log('Received setrank request:', req.body);
+  
   try {
     const { userId, roleId, apiKey } = req.body;
     
+    if (!userId || !roleId || !apiKey) {
+      console.log('Missing parameters');
+      return res.status(400).json({ success: false, error: 'Missing parameters' });
+    }
+    
     if (apiKey !== process.env.GAME_SECRET) {
+      console.log('Invalid game secret');
       return res.status(403).json({ success: false, error: 'Invalid API key' });
     }
+    
+    console.log(`Attempting to rank user ${userId} to role ${roleId}`);
     
     const response = await axios.patch(
       `https://apis.roblox.com/cloud/v2/groups/${GROUP_ID}/memberships/${userId}`,
@@ -33,9 +43,16 @@ app.post('/setrank', async (req, res) => {
       }
     );
     
+    console.log('Roblox API response:', response.data);
     res.json({ success: true });
+    
   } catch (error) {
-    console.error('Error:', error.response?.data || error.message);
+    console.error('Error details:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    
     res.status(500).json({ 
       success: false, 
       error: error.response?.data?.message || error.message 
