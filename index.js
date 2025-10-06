@@ -1,0 +1,49 @@
+const express = require('express');
+const axios = require('axios');
+const app = express();
+
+app.use(express.json());
+
+// YOUR CONFIGURATION
+const API_KEY = process.env.API_KEY || 'YOUR_API_KEY_HERE';
+const GROUP_ID = 34272721;
+
+// Test endpoint
+app.get('/', (req, res) => {
+  res.send('Ranking server is working!');
+});
+
+// Endpoint to change ranks
+app.post('/setrank', async (req, res) => {
+  try {
+    const { userId, roleId, apiKey } = req.body;
+    
+    if (apiKey !== process.env.GAME_SECRET) {
+      return res.status(403).json({ success: false, error: 'Invalid API key' });
+    }
+    
+    const response = await axios.patch(
+      `https://apis.roblox.com/cloud/v2/groups/${GROUP_ID}/memberships/${userId}`,
+      { roleId: roleId },
+      {
+        headers: {
+          'x-api-key': API_KEY,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error:', error.response?.data || error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: error.response?.data?.message || error.message 
+    });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log('Ranking server running on port ' + PORT);
+});
